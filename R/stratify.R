@@ -17,8 +17,6 @@
 #' @return An object of the same type as `x` (either a numeric vector or a
 #' `SpatRaster` object).
 #' @export
-#'
-#' @examples
 stratify <- function(x, n_strata, equal_split = TRUE, probs = NULL, vals = NULL) {
   if (equal_split & (!is.null(probs) | !is.null(vals))) {
     stop("If `equal_split`, both `probs` and `vals` must be NULL.")
@@ -35,21 +33,21 @@ stratify <- function(x, n_strata, equal_split = TRUE, probs = NULL, vals = NULL)
   if (!equal_split & !is.null(vals) & length(vals) != (n_strata - 1)) {
     stop("Length of `vals` should equal the number of splits (i.e., `n_strata` - 1).")
   }
-  if (class(x) == "SpatRaster") {
+  if (inherits(x, what = "SpatRaster")) {
     r <- x
     df <- spatialsample_prep(r, cells = TRUE, xy = TRUE)
     x <- dplyr::pull(x, var = 1)
   }
   if (equal_split) {
-    vec <- quantile(x, probs = seq(0, 1, length.out = n_strata + 1))
+    vec <- stats::quantile(x, probs = seq(0, 1, length.out = n_strata + 1))
   } else {
     if (!is.null(probs)) {
-      vec <- quantile(x, probs = c(0, probs, 1))
+      vec <- stats::quantile(x, probs = c(0, probs, 1))
     } else if (!is.null(vals)) {
       vec <- c(min(x), vals, max(x))
     }
   }
-  if (class(x) == "SpatRaster") {
+  if (inherits(x, what = "SpatRaster")) {
     y <- findInterval(x, vec = vec, rightmost.closed = TRUE)
     terra::set.values(r, cells = df$.cell, values = y)
     r

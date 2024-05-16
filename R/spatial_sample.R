@@ -26,8 +26,6 @@
 #'
 #' @return description
 #' @export
-#'
-#' @examples
 spatial_sample <- function(data, n, design, r, bias_var, bias_thresh, strata_var, clh_var, clh_iter) {
   if (design == "random") {
     spatialsample_random(data, n = n)
@@ -49,7 +47,6 @@ spatial_sample <- function(data, n, design, r, bias_var, bias_thresh, strata_var
 #' @param var description
 #'
 #' @return description
-#' @examples
 spatialsample_random <- function(data, n) {
   data |>
     tibble::as_tibble() |>
@@ -110,7 +107,6 @@ spatialsample_balanced_stratified <- function(data, n, r, var) {
 #' @param design description
 #'
 #' @return description
-#' @examples
 spatialsample_prep <- function(x, cells = FALSE, xy = FALSE, scale = FALSE) {
   if (scale) x <- terra::scale(x, center = TRUE, scale = TRUE)
   df <- x |>
