@@ -26,10 +26,13 @@
 #'
 #' @return description
 #' @export
-spatial_sample <- function(x, n, method, bias_var, bias_thresh, strata_var, clh_var, clh_iter, drop_na = TRUE, as_raster = FALSE) {
+spatial_sample <- function(x, n, method, bias_var, bias_thresh, clh_var, clh_iter, strata_var = NULL, drop_na = TRUE, as_raster = FALSE) {
 
   if (method %in% c("balanced", "balanced-stratified")) {
-    stopifnot("if `method` is 'balanced' or 'balanced-stratified'', then x must be a SpatRaster" = inherits(x, "SpatRaster"))
+    stopifnot("if `method` is 'balanced' or 'balanced-stratified', then x must be a SpatRaster" = inherits(x, "SpatRaster"))
+    if (method == "balanced-stratified") {
+      stopifnot("if `method` is 'balanced-stratified', then `strata_var` must be specified" = is.null(strata_var))
+    }
   }
 
   if (inherits(x, "SpatRaster") & !(method %in% c("balanced", "balanced-stratified"))) {
@@ -48,9 +51,7 @@ spatial_sample <- function(x, n, method, bias_var, bias_thresh, strata_var, clh_
     samp <- spatialsample_stratified(df, n = n, var = strata_var)
   } else if (method == "clh") {
     samp <- spatialsample_clh(df, n = n, var = clh_var, iter = clh_iter)
-  } else if (method == "balanced") {
-    samp <- spatialsample_balanced(x, n = n, drop_na = drop_na, as_raster = as_raster)
-  } else if (method == "balanced-stratified") {
+  } else if (method %in% c("balanced", "balanced-stratified")) {
     samp <- spatialsample_balanced(x, n = n, strata_var = strata_var, drop_na = drop_na, as_raster = as_raster)
   }
 
@@ -98,7 +99,7 @@ spatialsample_clh <- function(data, n, var, iter) {
     tibble::as_tibble() |>
     dplyr::slice(clh_samp$index_samples)
 }
-spatialsample_balanced <- function(r, n, strata_var = NULL, drop_na = TRUE, as_raster = FALSE) {
+spatialsample_balanced <- function(r, n, strata_var = NULL, drop_na = TRUE) {
   if (!is.null(strata_var)) {
     df <- r |>
       terra::as.data.frame(cells = TRUE, na.rm = drop_na) |>
@@ -120,16 +121,10 @@ spatialsample_balanced <- function(r, n, strata_var = NULL, drop_na = TRUE, as_r
   }
   ba_samp <- MBHdesign::quasiSamp(n = n, dimension = 2, inclusion.probs = r_ip) |>
     tibble::as_tibble()
-  if (as_raster) {
-    x_samp <- r
-    x_samp[-ba_samp$ID] <- NA
-    x_samp
-  } else {
-    r |>
-      terra::as.data.frame(cells = TRUE, na.rm = drop_na) |>
-      tibble::as_tibble() |>
-      dplyr::filter(cell %in% ba_samp$ID)
-  }
+  r |>
+    terra::as.data.frame(cells = TRUE, na.rm = drop_na) |>
+    tibble::as_tibble() |>
+    dplyr::filter(cell %in% ba_samp$ID)
 }
 
 #' Spatial sample prep
