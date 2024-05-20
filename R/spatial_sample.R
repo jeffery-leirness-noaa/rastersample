@@ -35,12 +35,12 @@ spatial_sample <- function(x, n, method, bias_var, bias_thresh, clh_var, clh_ite
     }
   }
 
+  if (drop_na) x[!terra::noNA(x)] <- NA
+
   if (inherits(x, "SpatRaster") & !(method %in% c("balanced", "balanced-stratified"))) {
     df <- x |>
       terra::as.data.frame(cells = TRUE, na.rm = drop_na) |>
       tibble::as_tibble()
-  } else {
-    df <- x
   }
 
   if (method == "random") {
@@ -52,7 +52,7 @@ spatial_sample <- function(x, n, method, bias_var, bias_thresh, clh_var, clh_ite
   } else if (method == "clh") {
     samp <- spatialsample_clh(df, n = n, var = clh_var, iter = clh_iter)
   } else if (method %in% c("balanced", "balanced-stratified")) {
-    samp <- spatialsample_balanced(x, n = n, strata_var = strata_var, drop_na = drop_na, as_raster = as_raster)
+    samp <- spatialsample_balanced(x, n = n, strata_var = strata_var, drop_na = drop_na)
   }
 
   if (inherits(x, "SpatRaster") & as_raster) {
@@ -110,7 +110,6 @@ spatialsample_balanced <- function(r, n, strata_var = NULL, drop_na = TRUE) {
     r_ip <- r |>
       terra::subset(subset = strata_var)  # converting NA's to 0's (as in `balanced` sample above) causes an issue with the raster resulting from terra::set.values() below
     terra::set.values(r_ip, cells = df$cell, values = df$.w * 1e+07)
-    if (drop_na) r_ip[!terra::noNA(r)] <- NA
   } else {
     if (drop_na) {
       r_ip <- terra::noNA(r) * 1
