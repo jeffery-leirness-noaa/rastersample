@@ -34,24 +34,27 @@ stratify <- function(x, n_strata, equal_split = TRUE, probs = NULL, vals = NULL)
     stop("Length of `vals` should equal the number of splits (i.e., `n_strata` - 1).")
   }
   if (inherits(x, what = "SpatRaster")) {
-    r <- x
-    df <- spatialsample_prep(r, cells = TRUE, xy = TRUE)
-    x <- dplyr::pull(x, var = 1)
+    x <- terra::subset(x, subset = 1)
+    df <- x |>
+      terra::as.data.frame(cells = TRUE, na.rm = TRUE) |>
+      tibble::as_tibble()
+    vec <- dplyr::pull(df, var = -1)
   }
   if (equal_split) {
-    vec <- stats::quantile(x, probs = seq(0, 1, length.out = n_strata + 1))
+    breaks <- stats::quantile(vec, probs = seq(0, 1, length.out = n_strata + 1))
   } else {
     if (!is.null(probs)) {
-      vec <- stats::quantile(x, probs = c(0, probs, 1))
+      breaks <- stats::quantile(vec, probs = c(0, probs, 1))
     } else if (!is.null(vals)) {
-      vec <- c(min(x), vals, max(x))
+      breaks <- c(min(vec), vals, max(vec))
     }
   }
   if (inherits(x, what = "SpatRaster")) {
-    y <- findInterval(x, vec = vec, rightmost.closed = TRUE)
-    terra::set.values(r, cells = df$.cell, values = y)
-    r
+    y <- findInterval(vec, vec = breaks, rightmost.closed = TRUE)
+    terra::set.values(x, cells = df$cell, values = y)
+    names(x) <- paste0(names(x), "_strata")
+    x
   } else {
-    findInterval(x, vec = vec, rightmost.closed = TRUE)
+    findInterval(x, vec = breaks, rightmost.closed = TRUE)
   }
 }
