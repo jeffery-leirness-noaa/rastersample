@@ -23,4 +23,5 @@ Imports:
     dplyr,
     MBHdesign,
     terra,
-    tibble
+    tibble,
+    tidyr
