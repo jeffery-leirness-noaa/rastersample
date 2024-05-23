@@ -2,8 +2,7 @@
 #'
 #' Take a sample of the data according to the specified sampling method
 #'
-#' @param data A `data.frame` object, ideally the output from
-#' spatialsample_prep().
+#' @param data A `SpatRaster` or `data.frame` object.
 #' @param n The number of `data.frame` rows to select (i.e., the sample size).
 #' @param method Which sampling method should be used to select the rows?
 #'   * `"random"` (the default): random sampling via `dplyr::slice_sample()`.
@@ -31,7 +30,7 @@ spatial_sample <- function(x, n, method, bias_var, bias_thresh, clh_var, clh_ite
   if (method %in% c("balanced", "balanced-stratified")) {
     stopifnot("if `method` is 'balanced' or 'balanced-stratified', then x must be a SpatRaster" = inherits(x, "SpatRaster"))
     if (method == "balanced-stratified") {
-      stopifnot("if `method` is 'balanced-stratified', then `strata_var` must be specified" = is.null(strata_var))
+      stopifnot("if `method` is 'balanced-stratified', then `strata_var` must be specified" = !is.null(strata_var))
     }
   }
 
