@@ -17,8 +17,8 @@
 #'   * `"balanced-stratified"`: spatially balanced stratified sampling via
 #'   `MBHdesign::quasiSamp()`.
 #' @param bias_var The `data.frame` column or `SpatRaster` layer to use for
-#' biased sampling (i.e., when `method` is `"biased"`). Must be a single
-#' variable.
+#' biased sampling (i.e., when `method` is `"biased"`). Must be a character
+#' vector of length 1.
 #' @param bias_thresh The biased sampling numeric threshold value. If `method`
 #' is `"biased"`, only rows for which `bias_var` value is greater than
 #' `bias_thresh` are considered eligible for sampling.

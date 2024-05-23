@@ -37,8 +37,8 @@ of strata) rows for each value of \code{strata_var} via \code{dplyr::slice_sampl
 }}
 
 \item{bias_var}{The \code{data.frame} column or \code{SpatRaster} layer to use for
-biased sampling (i.e., when \code{method} is \code{"biased"}). Must be a single
-variable.}
+biased sampling (i.e., when \code{method} is \code{"biased"}). Must be a character
+vector of length 1.}
 
 \item{bias_thresh}{The biased sampling numeric threshold value. If \code{method}
 is \code{"biased"}, only rows for which \code{bias_var} value is greater than
