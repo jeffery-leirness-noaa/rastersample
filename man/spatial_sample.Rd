@@ -5,53 +5,67 @@
 \title{Spatial sample}
 \usage{
 spatial_sample(
-  data,
+  x,
   n,
-  design,
-  r,
-  bias_var,
-  bias_thresh,
-  strata_var,
-  clh_var,
-  clh_iter
+  method,
+  bias_var = NULL,
+  bias_thresh = NULL,
+  clh_var = NULL,
+  clh_iter = NULL,
+  strata_var = NULL,
+  drop_na = TRUE,
+  as_raster = FALSE
 )
 }
 \arguments{
-\item{data}{A \code{data.frame} object, ideally the output from
-spatialsample_prep().}
+\item{x}{A \code{data.frame} or \code{SpatRaster} object.}
 
-\item{n}{The number of \code{data.frame} rows to select (i.e., the sample size).}
+\item{n}{The number of \code{data.frame} rows or \code{SpatRaster} cells to select
+(i.e., the sample size).}
 
-\item{design}{Which sampling design should be used to select the rows?
+\item{method}{Which sampling method should be used to select the rows?
 \itemize{
 \item \code{"random"} (the default): random sampling via \code{dplyr::slice_sample()}.
-\item \code{"biased"}: random sampling of rows for which \code{bias_var} value is greater than
-\code{bias_thresh} via \code{dplyr::slice_sample()}.
-\item \code{"stratified"}: stratified random sampling. Randomly select (n / number of strata) rows for each
-value of \code{strata_var} via \code{dplyr::slice_sample()}.
+\item \code{"biased"}: random sampling of rows for which \code{bias_var} value is greater
+than \code{bias_thresh} via \code{dplyr::slice_sample()}.
+\item \code{"stratified"}: stratified random sampling. Randomly select (n / number
+of strata) rows for each value of \code{strata_var} via \code{dplyr::slice_sample()}.
 \item \code{"clh"}: conditioned latin hypercube sampling via \code{clhs::clhs()}.
 \item \code{"balanced"}: spatially balanced sampling via \code{MBHdesign::quasiSamp()}.
-\item \code{"balanced_stratified"}: spatially balanced stratified sampling via
+\item \code{"balanced-stratified"}: spatially balanced stratified sampling via
 \code{MBHdesign::quasiSamp()}.
 }}
 
-\item{r}{A \code{SpatRaster} object specifying the}
+\item{bias_var}{The \code{data.frame} column or \code{SpatRaster} layer to use for
+biased sampling (i.e., when \code{method} is \code{"biased"}). Must be a single
+variable.}
 
-\item{bias_var}{description}
+\item{bias_thresh}{The biased sampling numeric threshold value. If \code{method}
+is \code{"biased"}, only rows for which \code{bias_var} value is greater than
+\code{bias_thresh} are considered eligible for sampling.}
 
-\item{bias_thresh}{description}
-
-\item{strata_var}{description}
-
-\item{clh_var}{description}
+\item{clh_var}{The \code{data.frame} columns or \code{SpatRaster} layers to use for
+conditioned latin hypercube sampling (i.e., when \code{method} is \code{"clh"}). Must
+be character vector of length greater than 1.}
 
 \item{clh_iter}{A positive number, giving the number of iterations for the
-Metropolis-Hastings annealing process. If \code{design} is \code{"clh"}, this value is
+Metropolis-Hastings annealing process. If \code{method} is \code{"clh"}, this value is
 passed to the \code{iter} argument of \code{clhs::clhs()}.}
+
+\item{strata_var}{The \code{data.frame} column(s) or \code{SpatRaster} layer(s) that
+define the strata for stratified sampling (i.e., when \code{method} is
+\code{"stratafied"} or \code{"balanced-stratified"}).}
+
+\item{drop_na}{Whether or not to exclude \code{data.frame} rows or \code{SpatRaster}
+cells with NA values prior to sampling.}
+
+\item{as_raster}{Whether or not to return a \code{SpatRaster} object.}
 }
 \value{
-description
+Either a \code{data.frame} (tibble) object (if \code{as_raster} is \code{FALSE}) or
+a \code{SpatRaster} object (if \code{as_raster} is \code{TRUE}).
 }
 \description{
-Take a sample of the data according to the specified sampling design
+Take a sample of the data (without replacement) according to the specified
+sampling method
 }
