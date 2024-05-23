@@ -11,7 +11,7 @@
 #' @param probs A numeric vector of probabilities, sorted increasingly, for the
 #' cut points with values in [0,1]. The length of this vector should equal
 #' `n_strata` - 1.
-#' @param vals A numeric vector of cut point values, sorted increasingly. The
+#' @param vals A numeric vector of break point values, sorted increasingly. The
 #' length of this vector should equal `n_strata` - 1.
 #'
 #' @return An object of the same type as `x` (either a numeric vector or a

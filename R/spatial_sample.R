@@ -1,31 +1,44 @@
 #' Spatial sample
 #'
-#' Take a sample of the data according to the specified sampling method
+#' Take a sample of the data (without replacement) according to the specified
+#' sampling method
 #'
-#' @param data A `SpatRaster` or `data.frame` object.
-#' @param n The number of `data.frame` rows to select (i.e., the sample size).
+#' @param x A `data.frame` or `SpatRaster` object.
+#' @param n The number of `data.frame` rows or `SpatRaster` cells to select
+#' (i.e., the sample size).
 #' @param method Which sampling method should be used to select the rows?
 #'   * `"random"` (the default): random sampling via `dplyr::slice_sample()`.
-#'   * `"biased"`: random sampling of rows for which `bias_var` value is greater than
-#'   `bias_thresh` via `dplyr::slice_sample()`.
-#'   * `"stratified"`: stratified random sampling. Randomly select (n / number of strata) rows for each
-#'   value of `strata_var` via `dplyr::slice_sample()`.
+#'   * `"biased"`: random sampling of rows for which `bias_var` value is greater
+#'   than `bias_thresh` via `dplyr::slice_sample()`.
+#'   * `"stratified"`: stratified random sampling. Randomly select (n / number
+#'   of strata) rows for each value of `strata_var` via `dplyr::slice_sample()`.
 #'   * `"clh"`: conditioned latin hypercube sampling via `clhs::clhs()`.
 #'   * `"balanced"`: spatially balanced sampling via `MBHdesign::quasiSamp()`.
 #'   * `"balanced-stratified"`: spatially balanced stratified sampling via
 #'   `MBHdesign::quasiSamp()`.
-#' @param r A `SpatRaster` object specifying the
-#' @param bias_var description
-#' @param bias_thresh description
-#' @param strata_var description
-#' @param clh_var description
+#' @param bias_var The `data.frame` column or `SpatRaster` layer to use for
+#' biased sampling (i.e., when `method` is `"biased"`). Must be a single
+#' variable.
+#' @param bias_thresh The biased sampling numeric threshold value. If `method`
+#' is `"biased"`, only rows for which `bias_var` value is greater than
+#' `bias_thresh` are considered eligible for sampling.
+#' @param clh_var The `data.frame` columns or `SpatRaster` layers to use for
+#' conditioned latin hypercube sampling (i.e., when `method` is `"clh"`). Must
+#' be character vector of length greater than 1.
 #' @param clh_iter A positive number, giving the number of iterations for the
 #' Metropolis-Hastings annealing process. If `method` is `"clh"`, this value is
 #' passed to the `iter` argument of `clhs::clhs()`.
+#' @param strata_var The `data.frame` column(s) or `SpatRaster` layer(s) that
+#' define the strata for stratified sampling (i.e., when `method` is
+#' `"stratafied"` or `"balanced-stratified"`).
+#' @param drop_na Whether or not to exclude `data.frame` rows or `SpatRaster`
+#' cells with NA values prior to sampling.
+#' @param as_raster Whether or not to return a `SpatRaster` object.
 #'
-#' @return description
+#' @return Either a `data.frame` (tibble) object (if `as_raster` is `FALSE`) or
+#' a `SpatRaster` object (if `as_raster` is `TRUE`).
 #' @export
-spatial_sample <- function(x, n, method, bias_var, bias_thresh, clh_var, clh_iter, strata_var = NULL, drop_na = TRUE, as_raster = FALSE) {
+spatial_sample <- function(x, n, method, bias_var = NULL, bias_thresh = NULL, clh_var = NULL, clh_iter = NULL, strata_var = NULL, drop_na = TRUE, as_raster = FALSE) {
 
   if (method %in% c("balanced", "balanced-stratified")) {
     stopifnot("if `method` is 'balanced' or 'balanced-stratified', then x must be a SpatRaster" = inherits(x, "SpatRaster"))
@@ -63,12 +76,7 @@ spatial_sample <- function(x, n, method, bias_var, bias_thresh, clh_var, clh_ite
   }
 
 }
-#' Spatial sample of data
-#'
-#' @inheritParams spatial_sample
-#' @param var description
-#'
-#' @return description
+# Spatial sample of data
 spatialsample_random <- function(data, n) {
   data |>
     tibble::as_tibble() |>
@@ -123,29 +131,4 @@ spatialsample_balanced <- function(r, n, strata_var = NULL, drop_na = TRUE) {
     terra::as.data.frame(cells = TRUE, na.rm = drop_na) |>
     tibble::as_tibble() |>
     dplyr::filter(cell %in% ba_samp$ID)
-}
-
-#' Spatial sample prep
-#'
-#' @param data description
-#' @param n description
-#' @param design description
-#'
-#' @return description
-spatialsample_prep <- function(x, cells = FALSE, xy = FALSE, scale = FALSE) {
-  if (scale) x <- terra::scale(x, center = TRUE, scale = TRUE)
-  df <- x |>
-    terra::as.data.frame(cells = cells, xy = xy, na.rm = TRUE) |>
-    tibble::as_tibble()
-  if (cells) {
-    df <- df |>
-      dplyr::rename(.cell = cell) |>
-      dplyr::relocate(.cell, .after = dplyr::last_col())
-  }
-  if (xy) {
-    df <- df |>
-      dplyr::rename(.x = x, .y = y) |>
-      dplyr::relocate(.x, .y, .after = dplyr::last_col())
-  }
-  df
 }
