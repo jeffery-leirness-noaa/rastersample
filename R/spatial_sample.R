@@ -52,11 +52,14 @@ spatial_sample <- function(x, n, method, bias_var = NULL, bias_thresh = NULL, cl
       x[!terra::noNA(x)] <- NA
     } else {
       df <- x |>
-        tidyr::drop_na() |>
-        tibble::as_tibble()
+        tidyr::drop_na()
     }
   } else if (!inherits(x, "SpatRaster")) {
-    df <- x
+    if (inherits(x, "sf")) {
+      df <- x
+    } else {
+      df <- tibble::as_tibble(x)
+    }
   }
 
   if (inherits(x, "SpatRaster") & !(method %in% c("balanced", "balanced-stratified"))) {
@@ -89,21 +92,19 @@ spatial_sample <- function(x, n, method, bias_var = NULL, bias_thresh = NULL, cl
 # Spatial sample of data
 spatialsample_random <- function(data, n) {
   data |>
-    tibble::as_tibble() |>
     dplyr::slice_sample(n = n)
 }
 spatialsample_biased <- function(data, n, var, thresh) {
   data |>
-    tibble::as_tibble() |>
     dplyr::filter(.data[[var]] > thresh) |>
     dplyr::slice_sample(n = n)
 }
 spatialsample_stratified <- function(data, n, var) {
   n_strata <- data |>
+    tibble::as_tibble() |>
     dplyr::select(dplyr::all_of(var)) |>
     dplyr::n_distinct()
   data |>
-    tibble::as_tibble() |>
     dplyr::group_by(.data[[var]]) |>
     dplyr::slice_sample(n = ceiling(n / n_strata))
 }
@@ -113,7 +114,6 @@ spatialsample_clh <- function(data, n, var, iter) {
     clhs::clhs(size = n, iter = iter, use.cpp = TRUE, simple = FALSE,
                progress = TRUE)
   data |>
-    tibble::as_tibble() |>
     dplyr::slice(clh_samp$index_samples)
 }
 spatialsample_balanced <- function(r, n, strata_var = NULL, drop_na = TRUE) {
