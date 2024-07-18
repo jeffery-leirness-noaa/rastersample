@@ -55,6 +55,8 @@ spatial_sample <- function(x, n, method, bias_var = NULL, bias_thresh = NULL, cl
         tidyr::drop_na() |>
         tibble::as_tibble()
     }
+  } else if (!inherits(x, "SpatRaster")) {
+    df <- x
   }
 
   if (inherits(x, "SpatRaster") & !(method %in% c("balanced", "balanced-stratified"))) {
