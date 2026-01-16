@@ -1,3 +1,5 @@
+# rastersample 0.1.2
+
 # rastersample 0.1.1
 
 ## Documentation
