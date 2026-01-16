@@ -235,6 +235,9 @@ spatialsample_stratified <- function(data, n, var) {
 #' @description
 #' `spatialsample_clh()` performs conditioned latin hypercube sampling.
 spatialsample_clh <- function(data, n, var, iter) {
+  if (is.null(iter)) {
+    iter <- 1e+04
+  }
   clh_samp <- data |>
     dplyr::select(dplyr::all_of(var)) |>
     clhs::clhs(
