@@ -20,16 +20,16 @@ in ecological and environmental research.
 
 ## Features
 
-- Multiple sampling methods:
-  - Random sampling
-  - Biased sampling based on threshold values
-  - Stratified random sampling
-  - Conditioned Latin hypercube sampling
-  - Spatially balanced sampling
-  - Spatially balanced stratified sampling
-- Works with both `data.frame` and `SpatRaster` objects
-- Options to filter NA values before sampling
-- Flexible output as either data frames or rasters
+  - Multiple sampling methods:
+      - Random sampling
+      - Biased sampling based on threshold values
+      - Stratified random sampling
+      - Conditioned Latin hypercube sampling
+      - Spatially balanced sampling
+      - Spatially balanced stratified sampling
+  - Works with both `data.frame` and `SpatRaster` objects
+  - Options to filter NA values before sampling
+  - Flexible output as either data frames or rasters
 
 ## Installation
 
@@ -37,8 +37,8 @@ You can install the development version of rastersample from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("jeffery-leirness/rastersample")
+# install.packages("pak")
+pak::pkg_install("jeffery-leirness/rastersample")
 ```
 
 ## Usage
@@ -94,11 +94,6 @@ commercial product or activity by DOC or the United States Government.
 
 ## License
 
-Software code created by U.S. Government employees is not subject to
-copyright in the United States (17 U.S.C. §105). The United
-States/Department of Commerce reserve all rights to seek and obtain
-copyright protection in countries other than the United States for
-Software authored in its entirety by the Department of Commerce. To this
-end, the Department of Commerce hereby grants to Recipient a
-royalty-free, nonexclusive license to use, copy, and create derivative
-works of the Software outside of the United States.
+This software is in the public domain in the United States and is
+released internationally under a royalty-free, nonexclusive license. See
+the [LICENSE](LICENSE) file for full details.
