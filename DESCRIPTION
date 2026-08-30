@@ -1,6 +1,6 @@
 Package: rastersample
 Title: Spatial sampling of raster data
-Version: 0.1.2
+Version: 0.1.3
 Authors@R: c(
     person(
       "Jeffery", "Leirness", 
